@@ -1,0 +1,34 @@
+version: '2'
+
+volumes:
+   pgdb:
+
+services:
+  redis:
+    image: redis
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: sentry
+      POSTGRES_PASSWORD: sentry
+      POSTGRES_DB: sentry
+    volumes:
+      - pgdb:/var/lib/postgresql/data
+
+  sentry:
+    image: sentry
+    command : sentry upgrade
+    links:
+      - redisa
+      - postgres
+    ports:
+      - 9000:9000
+    environment:
+      SENTRY_SECRET_KEY: '_0pyo&&7m4s5l4e7_t!#=f^&7@_zvr4(%d4j=(54d!t3#2&r9k'
+      SENTRY_POSTGRES_HOST: postgres
+      SENTRY_DB_USER: sentry
+      SENTRY_DB_PASSWORD: sentry
+      SENTRY_REDIS_HOST: redis
+    volumes:
+      - ./config.yml:/etc/sentry/config.yml
